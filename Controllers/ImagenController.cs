@@ -12,51 +12,37 @@ namespace ZuvoPetMvcAWS.Controllers
             this.service = service;
         }
 
-        public async Task<IActionResult> GetImagenAdoptante(string nombreImagen)
+        [HttpGet]
+        public IActionResult GetImagenAdoptante(string nombreImagen)
         {
-            Console.WriteLine($"NombreImagen recibido: {nombreImagen}");
-            try
-            {
-                if (!User.Identity.IsAuthenticated)
-                    return Unauthorized();
-                var imagenStream = await this.service.GetImagenAdoptanteAsync(nombreImagen);
+            if (!User.Identity.IsAuthenticated)
+                return Unauthorized();
 
-                // Determinar el tipo de contenido basado en la extensión
-                string contentType = "image/png"; // Por defecto
-                if (nombreImagen.EndsWith(".jpg") || nombreImagen.EndsWith(".jpeg"))
-                    contentType = "image/jpeg";
+            if (string.IsNullOrEmpty(nombreImagen))
+                return BadRequest();
 
-                Response.Headers.Add("Cache-Control", "private,max-age=3600");
+            // Elimina cualquier query string del nombre de la imagen
+            var nombreLimpio = nombreImagen.Split('?')[0];
 
-                return File(imagenStream, contentType);
-            }
-            catch (Exception ex)
-            {
-                // Puedes loguear el error si lo necesitas
-                return NotFound();
-            }
+            var url = service.GetPreSignedUrl(nombreLimpio);
+            return Redirect(url);
         }
 
-        public async Task<IActionResult> GetImagenRefugio(string nombreImagen)
+        [HttpGet]
+        public IActionResult GetImagenRefugio(string nombreImagen)
         {
-            try
-            {
-                var imagenStream = await this.service.GetImagenRefugioAsync(nombreImagen);
+            if (!User.Identity.IsAuthenticated)
+                return Unauthorized();
 
-                // Determinar el tipo de contenido basado en la extensión
-                string contentType = "image/png"; // Por defecto
-                if (nombreImagen.EndsWith(".jpg") || nombreImagen.EndsWith(".jpeg"))
-                    contentType = "image/jpeg";
+            if (string.IsNullOrEmpty(nombreImagen))
+                return BadRequest();
 
-                Response.Headers.Add("Cache-Control", "private,max-age=3600");
+            // Elimina cualquier query string del nombre de la imagen
+            var nombreLimpio = nombreImagen.Split('?')[0];
 
-                return File(imagenStream, contentType);
-            }
-            catch (Exception ex)
-            {
-                // Puedes loguear el error si lo necesitas
-                return NotFound();
-            }
+            var url = service.GetPreSignedUrl(nombreLimpio);
+            return Redirect(url);
         }
+
     }
 }

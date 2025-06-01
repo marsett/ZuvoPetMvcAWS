@@ -6,6 +6,8 @@ using ZuvoPetNuget.Models;
 using ZuvoPetNuget.Dtos;
 using System.Security.Claims;
 using System.Text.Json;
+using Amazon.S3;
+using Amazon.S3.Model;
 
 namespace ZuvoPetMvcAWS.Services
 {
@@ -14,11 +16,26 @@ namespace ZuvoPetMvcAWS.Services
         private string urlApi;
         private MediaTypeWithQualityHeaderValue header;
         private IHttpContextAccessor contextAccessor;
-        public ServiceZuvoPet(IConfiguration configuration, IHttpContextAccessor contextAccessor)
+        private readonly IAmazonS3 s3Client;
+        private readonly string bucketName = "bucket-zuvopet";
+
+        public ServiceZuvoPet(IConfiguration configuration, IHttpContextAccessor contextAccessor, IAmazonS3 s3Client)
         {
             this.urlApi = configuration.GetValue<string>("ApiUrls:ZuvoPetApiAzure");
             this.header = new MediaTypeWithQualityHeaderValue("application/json");
             this.contextAccessor = contextAccessor;
+            this.s3Client = s3Client;
+        }
+
+        public string GetPreSignedUrl(string key, int minutes = 10)
+        {
+            var request = new GetPreSignedUrlRequest
+            {
+                BucketName = bucketName,
+                Key = key,
+                Expires = DateTime.UtcNow.AddMinutes(minutes)
+            };
+            return s3Client.GetPreSignedURL(request);
         }
 
         public async Task<bool> EliminarFotoMascotaAsync(string nombreFoto)
@@ -132,7 +149,7 @@ namespace ZuvoPetMvcAWS.Services
                     client.DefaultRequestHeaders.Accept.Add(this.header);
                     client.DefaultRequestHeaders.Add("Authorization", "bearer " + token);
 
-                    // Crear un contenido multipart
+                    // Crea r un contenido multipart
                     using (var content = new MultipartFormDataContent())
                     {
                         // Convertir el archivo a stream content
@@ -292,8 +309,8 @@ namespace ZuvoPetMvcAWS.Services
                     Contrasena = password
                 };
                 string json = JsonConvert.SerializeObject(model);
-                StringContent content = new StringContent
-                    (json, Encoding.UTF8, "application/json");
+                StringContent content = new StringContent(json, Encoding.UTF8, "application/json");
+                // Solo pasa el path relativo aquí:
                 HttpResponseMessage response = await client.PostAsync(request, content);
                 if (response.IsSuccessStatusCode)
                 {
@@ -308,6 +325,7 @@ namespace ZuvoPetMvcAWS.Services
                 }
             }
         }
+
         private async Task<T> CallApiAsync<T>(string request)
         {
             using (HttpClient client = new HttpClient())

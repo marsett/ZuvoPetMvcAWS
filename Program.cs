@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.SignalR;
 //using ZuvoPetMvcAWS.Repositories;
 using ZuvoPetMvcAWS.Hubs;
 using ZuvoPetMvcAWS.Services;
+using Amazon.S3;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,8 @@ builder.Services.AddSession(options =>
 {
     options.IdleTimeout = TimeSpan.FromMinutes(30);
 });
+
+builder.Services.AddAWSService<IAmazonS3>();
 
 string connectionString = builder.Configuration.GetConnectionString("ZuvoPet");
 

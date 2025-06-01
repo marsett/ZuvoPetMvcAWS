@@ -1,16 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 using System.Text.Json;
-//using ZuvoPetMvcAWS.Data;
-using ZuvoPetMvcAWS.Filters;
-//using ZuvoPetMvcAWS.Helpers;
 using ZuvoPetNuget.Models;
-//using ZuvoPetMvcAWS.Repositories;
 using ZuvoPetMvcAWS.Services;
 using ZuvoPetNuget.Dtos;
+
 
 namespace ZuvoPetMvcAWS.Controllers
 {
@@ -346,7 +342,7 @@ namespace ZuvoPetMvcAWS.Controllers
                 }
             }
 
-            List<HistoriaExitoLandingDTO> historias = await this.service.GetHistoriasExitoLanding();
+            List<HistoriaExitoLandingDTO> historias = await this.service.GetHistoriasExitoLanding() ?? new List<HistoriaExitoLandingDTO>();
             return View(historias);
         }
 

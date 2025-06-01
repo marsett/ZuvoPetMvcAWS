@@ -275,14 +275,18 @@ namespace ZuvoPetMvcAWS.Controllers
             VistaPerfilAdoptante perfil = await this.service.GetPerfilAdoptante();
 
             //var favoritos = await this.repo.ObtenerMascotasFavoritas(idusuario);
-            var favoritos = await this.service.ObtenerMascotasFavoritas();
+            var favoritos = await this.service.ObtenerMascotasFavoritas() ?? new List<MascotaCard>();
             //var adoptadas = await this.repo.ObtenerMascotasAdoptadas(idusuario);
-            var adoptadas = await this.service.ObtenerMascotasAdoptadas();
+            var adoptadas = await this.service.ObtenerMascotasAdoptadas() ?? new List<MascotaAdoptada>();
 
             // Lógica de paginación
             var totalMascotas = favoritos.Count;
             var mascotaActual = totalMascotas > 0 && pagina <= totalMascotas ? favoritos[pagina - 1] : null;
-
+            if (perfil.RecursosDisponibles == null)
+            {
+                var recursosDisponibles = new List<string>();
+                perfil.RecursosDisponibles = recursosDisponibles;
+            }
             var viewModel = new PerfilAdoptanteViewModel
             {
                 Perfil = perfil,
