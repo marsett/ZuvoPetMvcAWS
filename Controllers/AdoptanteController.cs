@@ -1123,7 +1123,7 @@ namespace ZuvoPetMvcAWS.Controllers
                 // Asumiendo que FechaUltimoMensaje está en UTC
                 conversacion.FechaUltimoMensaje = TimeZoneInfo.ConvertTimeFromUtc(
                     conversacion.FechaUltimoMensaje,
-                    TimeZoneInfo.FindSystemTimeZoneById("Romance Standard Time")); // Para España
+                    TimeZoneInfo.FindSystemTimeZoneById("Europe/Madrid")); // Para España
             }
             return View(conversaciones);
         }
@@ -1176,7 +1176,7 @@ namespace ZuvoPetMvcAWS.Controllers
                 // Asumiendo que la propiedad Fecha en los mensajes es DateTime
                 mensaje.Fecha = TimeZoneInfo.ConvertTimeFromUtc(
                     mensaje.Fecha,
-                    TimeZoneInfo.FindSystemTimeZoneById("Romance Standard Time")); // Para España
+                    TimeZoneInfo.FindSystemTimeZoneById("Europe/Madrid")); // Para España
                                                                                    // Alternativa: mensaje.Fecha = mensaje.Fecha.ToLocalTime(); // Si prefieres usar la zona horaria del servidor
             }
 
